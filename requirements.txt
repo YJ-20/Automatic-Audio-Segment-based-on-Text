@@ -8,3 +8,5 @@ et-xmlfile==1.1.0
 openpyxl==3.1.2
 pycparser==2.21
 tqdm==4.65.0
+janome==0.4.2
+pykakasi==2.2.1

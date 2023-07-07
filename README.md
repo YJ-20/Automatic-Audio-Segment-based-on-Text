@@ -5,8 +5,11 @@
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
 [![paper](http://img.shields.io/badge/paper-arxiv.1001.2234-B31B1B.svg)](https://arxiv.org/abs/2305.13516)
 [![github](http://img.shields.io/badge/github-181717)](https://github.com/facebookresearch/fairseq/tree/main/examples/mms/data_prep)
-
 </div>
+
+This repository makes it easier and more powerful to use the Audio Segment Model provided by [MMS Aligner](https://github.com/facebookresearch/fairseq/tree/main/examples/mms/data_prep).
+For Japanese, kanji to hiragana conversion is supported before voice segmentation. (use *-l* args)
+
 
 ## Installation
 - Step 1: **Git clone**
@@ -43,9 +46,9 @@ Just execute the Python file ***run.py*** and follow the buttons on the tkinter 
   ```
 
 - Step 2-2: **CLI Run**
-Directly execute the Python file ***align_and_segment.py***. (required: -a, -t) Specify the audio path and text file path. (optional: -o) Specify the path where the output file will be saved.
+Directly execute the Python file ***align_and_segment.py***. (required: -a, -t) Specify the audio path and text file path. (optional: -o, -l) Specify the path where the output file will be saved and the language of the audio.
   ```
-  python align_and_segment.py -a /path/to/audio.wav -t /path/to/textfile -o /path/to/output_dir
+  python align_and_segment.py -a /path/to/audio.wav -t /path/to/textfile -o /path/to/output_dir -l <iso_code>
   ```
 
 ---

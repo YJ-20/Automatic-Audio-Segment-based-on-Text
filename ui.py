@@ -13,6 +13,7 @@ class GUI():
         self.output_fname = StringVar()
         self.status_text = StringVar()
         self.selected_sheet = IntVar()
+        self.lang = StringVar()
         self._init()
 
         self.window.mainloop()
@@ -37,7 +38,7 @@ class GUI():
         # text file
         input_frame = tk.Frame(self.window, width=300, height=100)
         input_frame.pack()
-        label = tk.Label(input_frame, text="텍스트 파일 (*.txt, *.csv, *.xlsx)", width=30)
+        label = tk.Label(input_frame, text="텍스트 파일 (*.txt, *.csv, *.xlsx)", width=25)
         label.grid(column=0, row=0, padx=10, pady=5)
         textbox = tk.Entry(input_frame, width=50, textvariable=self.selected_file)
         textbox.config(state="disabled")
@@ -46,7 +47,7 @@ class GUI():
         action = tk.Button(input_frame, text="파일 선택", command=self.select_file)
         action.grid(column=2, row=0, padx=10, pady=5)
         
-        option_frame = tk.Frame(self.window, width=300, height=100)
+        option_frame = tk.Frame(self.window, width=300, height=80)
         option_frame.pack(after=input_frame, anchor="ne")
         option_label = tk.Label(option_frame, text="시트번호 :", width=10)
         option_label.grid(column=0, row=0, padx=10, pady=5)
@@ -55,11 +56,21 @@ class GUI():
         self.selected_sheet.set(0)
         description = tk.Message(option_frame, text="(*.xlsx만 적용됨)", aspect=1000)
         description.grid(column=2, row=0)
+
+        option_frame2 = tk.Frame(self.window, width=300, height=80)
+        option_frame2.pack(after=option_frame, anchor="ne")
+        option_label2 = tk.Label(option_frame2, text="언어코드 :", width=10)
+        option_label2.grid(column=0, row=0, padx=10, pady=5)
+        textbox2 = tk.Entry(option_frame2, width=3, textvariable=self.lang)
+        textbox2.grid(column=1, row=0, padx=10, pady=5)
+        self.lang.set("eng")
+        description2 = tk.Message(option_frame2, text="ex: kor/eng/jpn", aspect=1000)
+        description2.grid(column=2, row=0)
         
         # audio file
         input_frame2 = tk.Frame(self.window, width=300, height=100)
         input_frame2.pack()
-        label2 = tk.Label(input_frame2, text="오디오 파일 (*.wav)", width=20)
+        label2 = tk.Label(input_frame2, text="오디오 파일 (*.wav)", width=25)
         label2.grid(column=0, row=0, padx=10, pady=5)
         textbox2 = tk.Entry(input_frame2, width=50, textvariable=self.selected_file2)
         textbox2.config(state="disabled")
@@ -71,7 +82,7 @@ class GUI():
         # output
         output_frame = tk.Frame(self.window, width=300, height=100)
         output_frame.pack()
-        out_label = tk.Label(output_frame, text="출력 디렉토리", width=20)
+        out_label = tk.Label(output_frame, text="출력 디렉토리", width=25)
         out_label.grid(column=0, row=0, padx=10, pady=5)
         textbox = tk.Entry(output_frame, width=50, textvariable=self.output_fname)
         textbox.grid(column=1, row=0, padx=10, pady=5)
@@ -96,6 +107,7 @@ class GUI():
         audio_file_path = self.selected_file2.get()
         output_file_path = self.output_fname.get()
         sheet_name = int(self.selected_sheet.get())
+        lang = self.lang.get()
         if not os.path.exists(text_file_path):
             tk.messagebox.showinfo(title="알림", message="텍스트 파일이 존재하지 않습니다.")
             return
@@ -113,7 +125,8 @@ class GUI():
             text_filepath=text_file_path, 
             audio_filepath=audio_file_path, 
             outdir=output_file_path, 
-            sheet_name=sheet_name
+            sheet_name=sheet_name,
+            lang=lang
         )
 
     def select_file(self):
@@ -131,7 +144,7 @@ class GUI():
             self.status_text.set("오디오 파일을 선택해주세요.")        
         self.selected_file2.set(loc2)
 
-        self.status_text.set("위치가 설정되었습니다. 결과 추출 버튼을 눌러주세요.")
+        self.status_text.set("출력 디렉토리는 변경 가능합니다. 디렉토리 확인 후 결과 추출 버튼을 눌러주세요.")
         
         dirname = os.path.dirname(loc2)
         self.output_fname.set(os.path.join(dirname,"split_output"))

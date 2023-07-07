@@ -4,6 +4,7 @@ import torch
 import torchaudio
 import sox
 import argparse
+from kanji_converter import kanji_to_kana, process_setup
 
 
 from text_normalization import text_normalize
@@ -109,7 +110,19 @@ def main_for_ui(text_filepath, audio_filepath, outdir="split_output", sheet_name
         transcripts = [str(t).strip() for t in transcripts if t]
     else:
         raise ValueError("Unsupported text file format")
-    norm_transcripts = [text_normalize(line.strip(), lang) for line in transcripts]
+    if lang == "jpn":
+        num_process, chunksize = process_setup(
+            kanji_list=transcripts,
+        )
+        _transcripts = kanji_to_kana(
+            kanji_list=transcripts,
+            num_process=num_process,
+            chunksize=chunksize,
+        )
+    else:
+        _transcripts = transcripts
+        
+    norm_transcripts = [text_normalize(line.strip(), lang) for line in _transcripts]
     tokens = get_uroman_tokens(norm_transcripts, uroman_path, lang)
 
     model, dictionary = load_model_dict()
@@ -151,10 +164,6 @@ def main_for_ui(text_filepath, audio_filepath, outdir="split_output", sheet_name
     return segments, stride
 
 def main(args):
-    # assert not os.path.exists(
-    #     args.outdir
-    # ), f"Error: Output path exists already {args.outdir}"
-    
     transcripts = []
     if args.text_filepath.endswith(".txt"):
         with open(args.text_filepath) as f:
@@ -168,6 +177,17 @@ def main(args):
         transcripts = [str(t).strip() for t in transcripts if t]
     else:
         raise ValueError("Unsupported text file format")
+    
+    if args.lang == "jpn":
+        num_process, chunksize = process_setup(
+            kanji_list=transcripts,
+        )
+        transcripts = kanji_to_kana(
+            kanji_list=transcripts,
+            num_process=num_process,
+            chunksize=chunksize,
+        )
+    
     norm_transcripts = [text_normalize(line.strip(), args.lang) for line in transcripts]
     tokens = get_uroman_tokens(norm_transcripts, args.uroman_path, args.lang)
 
@@ -207,40 +227,8 @@ def main(args):
         tfm.build_file(args.audio_filepath, output_file)
         
         splitted_audio_info.loc[i] = [audio_start_sec, str(output_file), audio_end_sec - audio_start_sec, t]
-        # sample = {
-        #     "audio_start_sec": audio_start_sec,
-        #     "audio_filepath": str(output_file),
-        #     "duration": audio_end_sec - audio_start_sec,
-        #     "text": t,
-        # }
-        # splitted_audio_info.append(sample, ignore_index=True)
     splitted_audio_info.to_csv(f"{args.outdir}/splitted_audio_info.csv", index=False, encoding="utf-8-sig")
     
-    # with open( f"{args.outdir}/manifest.json", "w") as f:
-    #     for i, t in enumerate(transcripts):
-    #         span = spans[i]
-    #         seg_start_idx = span[0].start
-    #         seg_end_idx = span[-1].end
-
-    #         output_file = f"{args.outdir}/segment{i}.wav"
-
-    #         audio_start_sec = seg_start_idx * stride / 1000
-    #         audio_end_sec = seg_end_idx * stride / 1000 
-
-    #         tfm = sox.Transformer()
-    #         tfm.trim(audio_start_sec , audio_end_sec)
-    #         tfm.build_file(args.audio_filepath, output_file)
-            
-    #         sample = {
-    #             "audio_start_sec": audio_start_sec,
-    #             "audio_filepath": str(output_file),
-    #             "duration": audio_end_sec - audio_start_sec,
-    #             "text": t,
-    #             "normalized_text":norm_transcripts[i],
-    #             "uroman_tokens": tokens[i],
-    #         }
-    #         f.write(json.dumps(sample) + "\n")
-
     return segments, stride
 
 
@@ -254,7 +242,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-l", "--lang", type=str, default="eng", help="ISO code of the language"
-    ) # 한국어, 일본어 영어는 모두 eng로 처리 가능
+    ) 
     parser.add_argument(
         "-u", "--uroman_path", type=str, default="uroman/bin", help="Location to uroman/bin"
     )
