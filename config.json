@@ -1,0 +1,10 @@
+{
+    "title": "Automatic Audio Segment based on Text",
+    "geometry": {
+        "width": 800,
+        "height": 200,
+        "x": 100,
+        "y": 100
+    },
+    "resizable": true
+}

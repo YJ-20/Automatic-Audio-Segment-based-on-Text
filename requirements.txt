@@ -1,0 +1,10 @@
+sox 
+dataclasses 
+pandas
+xlrd
+cffi==1.15.1
+colorama==0.4.6
+et-xmlfile==1.1.0
+openpyxl==3.1.2
+pycparser==2.21
+tqdm==4.65.0
