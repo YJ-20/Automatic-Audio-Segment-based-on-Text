@@ -64,10 +64,10 @@ def process_setup(
     kanji_list: list,
 ):
     # multiprocessing setup
-    num_process = os.cpu_count()
+    num_process = min(os.cpu_count(), len(kanji_list))
     chunksize = max(1,len(kanji_list) // num_process)
     print("-"*20)
-    print(f"Total processes:{os.cpu_count()} \nUsing processes:\t{num_process} \nChunk size:\t{chunksize}")
+    print(f"Total processes:{os.cpu_count()} \nUsing processes:{num_process} \nChunk size:{chunksize}")
     print("-"*20)    
     return num_process, chunksize
 
